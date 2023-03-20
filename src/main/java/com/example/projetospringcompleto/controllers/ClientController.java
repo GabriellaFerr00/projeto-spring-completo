@@ -2,7 +2,6 @@ package com.example.projetospringcompleto.controllers;
 
 import com.example.projetospringcompleto.domain.ClientEntity;
 import com.example.projetospringcompleto.repositories.ClientRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,9 +22,6 @@ public class ClientController {
             return ResponseEntity.ok(clients.get());
         }
         return ResponseEntity.notFound().build();
-
-        //return clients.map(ResponseEntity::ok)
-        //                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -44,4 +40,16 @@ public class ClientController {
         return ResponseEntity.notFound().build();
     }
 
+    @PutMapping(value = "/{id}")
+    public ResponseEntity updateClient(@PathVariable Integer id,
+                                       @RequestBody ClientEntity client){
+
+        return clientRepository
+                .findById(id)
+                .map(clientExisting -> {
+                    client.setId(clientExisting.getId());
+                    clientRepository.save(client);
+                    return ResponseEntity.noContent().build();
+                }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
