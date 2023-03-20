@@ -17,6 +17,12 @@ public class ClientController {
     @Autowired
     private ClientRepository clientRepository;
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClientEntity saveClient(@RequestBody ClientEntity clientEntity) {
+        return clientRepository.save(clientEntity);
+    }
+
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ClientEntity getClientById(@PathVariable("id") Integer id) {
@@ -35,12 +41,6 @@ public class ClientController {
         Example<ClientEntity> example = Example.of(filter, exampleMatcher);
 
         return clientRepository.findAll(example);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ClientEntity saveClient(@RequestBody ClientEntity clientEntity) {
-        return clientRepository.save(clientEntity);
     }
 
     @DeleteMapping(value = "/{id}")

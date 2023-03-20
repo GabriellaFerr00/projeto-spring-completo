@@ -28,6 +28,10 @@ public class OrderEntity {
 
     @OneToMany(mappedBy = "order")
     private List<OrderItemEntity> orderItem;
+    @PrePersist
+    private void setaPrePersist(){
+        dataOrder = LocalDate.now();
+    }
 
     @Override
     public String toString() {
