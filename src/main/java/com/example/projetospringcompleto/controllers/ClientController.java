@@ -3,10 +3,13 @@ package com.example.projetospringcompleto.controllers;
 import com.example.projetospringcompleto.domain.ClientEntity;
 import com.example.projetospringcompleto.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -22,6 +25,19 @@ public class ClientController {
             return ResponseEntity.ok(clients.get());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping
+    public ResponseEntity findClient(ClientEntity filter){
+        ExampleMatcher exampleMatcher = ExampleMatcher
+                                            .matching()
+                                            .withIgnoreCase()
+                                            .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example<ClientEntity> example = Example.of(filter, exampleMatcher);
+
+        List<ClientEntity> clientEntityList = clientRepository.findAll(example);
+
+        return ResponseEntity.ok(clientEntityList);
     }
 
     @PostMapping
