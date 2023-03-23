@@ -20,5 +20,6 @@ public class InformationOrderDTO {
     private String nameClient;
     private Double total;
     private LocalDate dataOrder;
+    private String status;
     private List<InformationItemOrderDTO> items;
 }

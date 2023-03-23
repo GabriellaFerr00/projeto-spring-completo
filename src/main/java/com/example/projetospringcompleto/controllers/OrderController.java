@@ -53,6 +53,7 @@ public class OrderController {
                 .cpf(order.getClient().getCpf())
                 .nameClient(order.getClient().getName())
                 .total(order.getTotal())
+                .status(order.getStatus().name())
                 .items(this.convertListItem(order.getOrderItem()))
                 .build();
 

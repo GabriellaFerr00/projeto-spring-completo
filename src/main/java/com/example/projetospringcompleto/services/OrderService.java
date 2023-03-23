@@ -6,6 +6,7 @@ import com.example.projetospringcompleto.domain.OrderItemEntity;
 import com.example.projetospringcompleto.domain.ProductEntity;
 import com.example.projetospringcompleto.dto.ItemOrderDTO;
 import com.example.projetospringcompleto.dto.OrderDTO;
+import com.example.projetospringcompleto.enums.StatusOrder;
 import com.example.projetospringcompleto.exception.MessageCode;
 import com.example.projetospringcompleto.exception.IdNotFoundException;
 import com.example.projetospringcompleto.repositories.ClientRepository;
@@ -42,6 +43,7 @@ public class OrderService {
         order.setTotal(dto.getTotal());
         order.setDataOrder(LocalDate.now());
         order.setClient(client);
+        order.setStatus(StatusOrder.ACCOMPLISHED);
 
        List<OrderItemEntity> orderItemEntities =  this.convertItems(order, dto.getItems());
 
