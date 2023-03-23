@@ -27,9 +27,10 @@ public class ClientEntity {
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private Set<OrderEntity> order;
 
-    public ClientEntity(Integer id, String name){
+    public ClientEntity(Integer id, String name, String cpf){
         this.id = id;
         this.name = name;
+        this.cpf = cpf;
     }
 
     @Override

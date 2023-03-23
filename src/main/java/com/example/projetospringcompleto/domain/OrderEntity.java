@@ -1,5 +1,6 @@
 package com.example.projetospringcompleto.domain;
 
+import com.example.projetospringcompleto.enums.StatusOrder;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,9 @@ public class OrderEntity {
 
     @OneToMany(mappedBy = "order")
     private List<OrderItemEntity> orderItem;
+
+    @Enumerated(EnumType.STRING)
+    private StatusOrder status;
     @PrePersist
     private void setaPrePersist(){
         dataOrder = LocalDate.now();

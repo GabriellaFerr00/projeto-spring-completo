@@ -1,73 +1,90 @@
 package com.example.projetospringcompleto.controllers;
 
 import com.example.projetospringcompleto.domain.OrderEntity;
-import com.example.projetospringcompleto.repositories.OrderRepository;
+import com.example.projetospringcompleto.domain.OrderItemEntity;
+import com.example.projetospringcompleto.dto.InformationItemOrderDTO;
+import com.example.projetospringcompleto.dto.InformationOrderDTO;
+import com.example.projetospringcompleto.dto.OrderDTO;
+import com.example.projetospringcompleto.dto.UpdateStatusOrderDTO;
+import com.example.projetospringcompleto.enums.StatusOrder;
+import com.example.projetospringcompleto.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
-
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderService orderService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderEntity createOrder(@RequestBody OrderEntity order){
-        return orderRepository.save(order);
+    public Integer createOrder(@RequestBody OrderDTO dto){
+        OrderEntity order = orderService.saveOrder(dto);
+        return order.getId();
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderEntity> getAllOrder(OrderEntity entityFilter) {
-        ExampleMatcher exampleMatcher = ExampleMatcher
-                .matching()
-                .withIgnoreCase()
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-
-        Example<OrderEntity> example = Example.of(entityFilter, exampleMatcher);
-
-        return orderRepository.findAll(example);
-
+    public InformationOrderDTO getById(@PathVariable("id") Integer id){
+        return orderService
+                .getFullOrder(id)
+                .map(this::convert)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
     }
 
-    @GetMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public OrderEntity getOrderById(@PathVariable("id") Integer id){
-        return orderRepository
-                .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
-    }
-
-    @DeleteMapping(value = "/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable("id") Integer id){
-        orderRepository.findById(id)
-                .map(order ->{
-                    orderRepository.deleteById(order.getId());
-                    return Void.TYPE;
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+    public void updateStatus(@PathVariable("id") Integer id,
+                             @RequestBody UpdateStatusOrderDTO dto){
+        String newStatus = dto.getNewStatus();
+
+        orderService.updateStatusOrder(id, StatusOrder.valueOf(newStatus));
+
     }
 
-    @PutMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateOrderById(@PathVariable("id") Integer id,
-                                @RequestBody OrderEntity orderEntity){
-        orderRepository
-                .findById(id)
-                .map(orderExisting -> {
-                    orderEntity.setId(orderExisting.getId());
-                    orderRepository.save(orderEntity);
-                    return orderEntity;
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+    private InformationOrderDTO convert(OrderEntity order){
+       return InformationOrderDTO.builder()
+                .cod(order.getId())
+                .dataOrder(order.getDataOrder())
+                .cpf(order.getClient().getCpf())
+                .nameClient(order.getClient().getName())
+                .total(order.getTotal())
+                .status(order.getStatus().name())
+                .items(this.convertListItem(order.getOrderItem()))
+                .build();
+
+    }
+
+    private List<InformationItemOrderDTO> convertListItem(List<OrderItemEntity> itemEntityList){
+        if(isEmpty(itemEntityList)){
+            return Collections.emptyList();
+        }
+
+        return itemEntityList
+                .stream()
+                .map(item -> InformationItemOrderDTO
+                        .builder()
+                        .descriptionOrder(item.getProduct().getDescription())
+                        .priceUnitary(item.getProduct().getPrice())
+                        .amount(item.getAmount())
+                        .build()
+                ).collect(Collectors.toList());
     }
 }
