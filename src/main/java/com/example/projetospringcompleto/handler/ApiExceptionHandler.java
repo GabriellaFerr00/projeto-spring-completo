@@ -3,6 +3,7 @@ package com.example.projetospringcompleto.handler;
 import com.example.projetospringcompleto.exception.EmptyListException;
 import com.example.projetospringcompleto.exception.IdNotFoundException;
 import com.example.projetospringcompleto.exception.MessageCode;
+import com.example.projetospringcompleto.exception.OrderNotFoundException;
 import com.example.projetospringcompleto.handler.errors.ApiErrors;
 import lombok.AllArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -45,6 +46,19 @@ public class ApiExceptionHandler {
                 .details(getCodeMessage(MessageCode.EMPTY_LIST))
                 .timestamp(LocalDateTime.now())
                 .cause(getCodeMessage(MessageCode.CAUSE_EMPTY_LIST))
+                .build();
+        return new ResponseEntity<>(apiErrors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ApiErrors> handlerOrderNotFoundException(OrderNotFoundException ex, WebRequest request){
+        ApiErrors apiErrors = ApiErrors
+                .builder()
+                .title(getCodeMessage(MessageCode.INVALID_REQUEST))
+                .status(HttpStatus.BAD_REQUEST.value())
+                .details(getCodeMessage(MessageCode.ORDER_NOT_FOUND))
+                .timestamp(LocalDateTime.now())
+                .cause(getCodeMessage(MessageCode.CAUSE_ORDER_NOT_FOUND))
                 .build();
         return new ResponseEntity<>(apiErrors, HttpStatus.BAD_REQUEST);
     }

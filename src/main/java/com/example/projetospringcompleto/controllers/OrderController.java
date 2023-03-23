@@ -5,10 +5,13 @@ import com.example.projetospringcompleto.domain.OrderItemEntity;
 import com.example.projetospringcompleto.dto.InformationItemOrderDTO;
 import com.example.projetospringcompleto.dto.InformationOrderDTO;
 import com.example.projetospringcompleto.dto.OrderDTO;
+import com.example.projetospringcompleto.dto.UpdateStatusOrderDTO;
+import com.example.projetospringcompleto.enums.StatusOrder;
 import com.example.projetospringcompleto.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +47,16 @@ public class OrderController {
                 .getFullOrder(id)
                 .map(this::convert)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateStatus(@PathVariable("id") Integer id,
+                             @RequestBody UpdateStatusOrderDTO dto){
+        String newStatus = dto.getNewStatus();
+
+        orderService.updateStatusOrder(id, StatusOrder.valueOf(newStatus));
+
     }
 
     private InformationOrderDTO convert(OrderEntity order){

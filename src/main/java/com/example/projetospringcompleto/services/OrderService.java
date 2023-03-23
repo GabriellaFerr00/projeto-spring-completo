@@ -9,6 +9,7 @@ import com.example.projetospringcompleto.dto.OrderDTO;
 import com.example.projetospringcompleto.enums.StatusOrder;
 import com.example.projetospringcompleto.exception.MessageCode;
 import com.example.projetospringcompleto.exception.IdNotFoundException;
+import com.example.projetospringcompleto.exception.OrderNotFoundException;
 import com.example.projetospringcompleto.repositories.ClientRepository;
 import com.example.projetospringcompleto.repositories.OrderItemRepository;
 import com.example.projetospringcompleto.repositories.OrderRepository;
@@ -58,6 +59,15 @@ public class OrderService {
 
     public Optional<OrderEntity> getFullOrder(Integer id){
         return orderRepository.findByIdFetchOrderItem(id);
+    }
+
+    @Transactional
+    public void updateStatusOrder(Integer id, StatusOrder statusOrder){
+        orderRepository.findById(id)
+                .map(order -> {
+                    order.setStatus(statusOrder);
+                    return  orderRepository.save(order);
+                }).orElseThrow(() -> new OrderNotFoundException(MessageCode.ORDER_NOT_FOUND));
     }
 
 
