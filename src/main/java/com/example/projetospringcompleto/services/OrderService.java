@@ -6,18 +6,19 @@ import com.example.projetospringcompleto.domain.OrderItemEntity;
 import com.example.projetospringcompleto.domain.ProductEntity;
 import com.example.projetospringcompleto.dto.ItemOrderDTO;
 import com.example.projetospringcompleto.dto.OrderDTO;
-import com.example.projetospringcompleto.exception.BussinessRuleException;
+import com.example.projetospringcompleto.exception.MessageCode;
+import com.example.projetospringcompleto.exception.IdNotFoundException;
 import com.example.projetospringcompleto.repositories.ClientRepository;
 import com.example.projetospringcompleto.repositories.OrderItemRepository;
 import com.example.projetospringcompleto.repositories.OrderRepository;
 import com.example.projetospringcompleto.repositories.ProductRepository;
-import jakarta.persistence.Table;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,7 @@ public class OrderService {
     public OrderEntity saveOrder(OrderDTO dto){
         Integer idClient = dto.getIdClient();
         ClientEntity client = clientRepository.findById(idClient)
-                .orElseThrow(() -> new BussinessRuleException("Invalid client code"));
+                .orElseThrow(() -> new IdNotFoundException(MessageCode.FIELD_ID_NOT_FOUND));
 
         OrderEntity order = new OrderEntity();
         order.setTotal(dto.getTotal());
@@ -53,9 +54,14 @@ public class OrderService {
 
     }
 
+    public Optional<OrderEntity> getFullOrder(Integer id){
+        return orderRepository.findByIdFetchOrderItem(id);
+    }
+
+
     private List<OrderItemEntity> convertItems(OrderEntity order, List<ItemOrderDTO> dtoItems) {
         if(dtoItems.isEmpty()) {
-            throw new BussinessRuleException("It is not possible to place an order without an item");
+            throw new IdNotFoundException(MessageCode.EMPTY_LIST);
         }
 
         return dtoItems
@@ -63,7 +69,7 @@ public class OrderService {
                 .map(dto -> {
                     Integer idProduct = dto.getIdProduct();
                     ProductEntity product = productRepository.findById(idProduct)
-                            .orElseThrow(() -> new BussinessRuleException("Invalid client code" + idProduct));
+                            .orElseThrow(() -> new IdNotFoundException(MessageCode.FIELD_ID_NOT_FOUND));
 
                     OrderItemEntity orderItem = new OrderItemEntity();
                     orderItem.setAmount(dto.getAmount());
@@ -72,8 +78,5 @@ public class OrderService {
 
                     return  orderItem;
                 }).collect(Collectors.toList());
-
-
     }
-
 }
