@@ -3,6 +3,7 @@ package com.example.projetospringcompleto.handler;
 import com.example.projetospringcompleto.exception.EmptyListException;
 import com.example.projetospringcompleto.exception.IdNotFoundException;
 import com.example.projetospringcompleto.exception.MessageCode;
+import com.example.projetospringcompleto.exception.MethodNotValidException;
 import com.example.projetospringcompleto.exception.OrderNotFoundException;
 import com.example.projetospringcompleto.handler.errors.ApiErrors;
 import lombok.AllArgsConstructor;
@@ -59,6 +60,19 @@ public class ApiExceptionHandler {
                 .details(getCodeMessage(MessageCode.ORDER_NOT_FOUND))
                 .timestamp(LocalDateTime.now())
                 .cause(getCodeMessage(MessageCode.CAUSE_ORDER_NOT_FOUND))
+                .build();
+        return new ResponseEntity<>(apiErrors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodNotValidException.class)
+    public ResponseEntity<ApiErrors> handlerMethodNotValidException(MethodNotValidException ex, WebRequest request){
+        ApiErrors apiErrors = ApiErrors
+                .builder()
+                .title(getCodeMessage(MessageCode.INVALID_REQUEST))
+                .status(HttpStatus.BAD_REQUEST.value())
+                .details(getCodeMessage(MessageCode.INVALID_FIELD))
+                .timestamp(LocalDateTime.now())
+                .cause(getCodeMessage(MessageCode.CAUSE_INVALID_FIELD))
                 .build();
         return new ResponseEntity<>(apiErrors, HttpStatus.BAD_REQUEST);
     }

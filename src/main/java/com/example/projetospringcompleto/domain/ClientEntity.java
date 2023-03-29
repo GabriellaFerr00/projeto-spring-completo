@@ -2,10 +2,12 @@ package com.example.projetospringcompleto.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.util.Set;
 
@@ -21,6 +23,7 @@ public class ClientEntity {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private String name;
+    @CPF(message = "Provide a valid CPF.")
     private String cpf;
 
     @JsonIgnore

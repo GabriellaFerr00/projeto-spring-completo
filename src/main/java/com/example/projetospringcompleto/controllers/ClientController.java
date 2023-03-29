@@ -2,6 +2,7 @@ package com.example.projetospringcompleto.controllers;
 
 import com.example.projetospringcompleto.domain.ClientEntity;
 import com.example.projetospringcompleto.repositories.ClientRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -19,7 +20,7 @@ public class ClientController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClientEntity saveClient(@RequestBody ClientEntity clientEntity) {
+    public ClientEntity saveClient(@RequestBody @Valid ClientEntity clientEntity) {
         return clientRepository.save(clientEntity);
     }
 
