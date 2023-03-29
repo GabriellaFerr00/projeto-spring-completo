@@ -8,6 +8,7 @@ import com.example.projetospringcompleto.dto.OrderDTO;
 import com.example.projetospringcompleto.dto.UpdateStatusOrderDTO;
 import com.example.projetospringcompleto.enums.StatusOrder;
 import com.example.projetospringcompleto.services.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Integer createOrder(@RequestBody OrderDTO dto){
+    public Integer createOrder(@RequestBody @Valid OrderDTO dto){
         OrderEntity order = orderService.saveOrder(dto);
         return order.getId();
     }

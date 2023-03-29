@@ -2,6 +2,7 @@ package com.example.projetospringcompleto.controllers;
 
 import com.example.projetospringcompleto.domain.ProductEntity;
 import com.example.projetospringcompleto.repositories.ProductRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -20,7 +21,7 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductEntity createProduct(@RequestBody ProductEntity product){
+    public ProductEntity createProduct(@RequestBody @Valid ProductEntity product){
         return productRepository.save(product);
     }
 
@@ -60,7 +61,7 @@ public class ProductController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateProductById(@PathVariable("id") Integer id,
-                                @RequestBody ProductEntity product){
+                                @RequestBody @Valid ProductEntity product){
         productRepository
                 .findById(id)
                 .map(productExisting -> {
